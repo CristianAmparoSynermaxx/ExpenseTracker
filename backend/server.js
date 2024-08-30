@@ -3,7 +3,7 @@ const { errorHandler } = require("./middleware/errorMiddleware");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 require("dotenv").config();
-const PORT = process.env.PORT || 6000;
+const PORT = process.env.PORT || 3000;
 const app = express();
 
 app.use(express.json());

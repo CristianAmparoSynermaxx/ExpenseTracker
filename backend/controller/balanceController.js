@@ -1,15 +1,17 @@
 const asyncHandler = require("express-async-handler");
-const db = require("../db"); // Adjust the path as necessary
+const db = require("../db"); // Adjust the path if necessary
 
+// Function to get balance for a user
 const getBalance = asyncHandler(async (req, res) => {
-  const { id } = req.params; // Extract user_id from route parameters
+  const { id } = req.params;
 
   if (!id) {
     return res.status(400).json({ error: "User ID is required" });
   }
 
+  let connection;
   try {
-    const connection = await db.getConnection();
+    connection = await db.getConnection();
     const query = "SELECT balance_amount FROM tbl_balance WHERE user_id = ?";
     const [rows] = await connection.execute(query, [id]);
 
@@ -26,15 +28,13 @@ const getBalance = asyncHandler(async (req, res) => {
       .status(500)
       .json({ error: "An error occurred while retrieving the balance" });
   } finally {
-    // Ensure the connection is released back to the pool
     if (connection) {
       connection.release();
     }
   }
 });
 
-module.exports = getBalance;
-
+// Function to add balance for a user
 const addBalance = asyncHandler(async (req, res) => {
   const { added_balance } = req.body;
   const { id } = req.params;
@@ -47,39 +47,32 @@ const addBalance = asyncHandler(async (req, res) => {
     return res.status(400).json({ error: "Valid added balance is required" });
   }
 
-  const connection = await db.getConnection(); // Get a connection from the pool
+  let connection;
   try {
+    connection = await db.getConnection();
     await connection.beginTransaction();
 
-    // Step 1: Check if balance record exists
     const [balanceRows] = await connection.execute(
       "SELECT balance_amount FROM tbl_balance WHERE user_id = ?",
       [id]
     );
 
-    let currentBalance, newBalance;
+    let currentBalance =
+      balanceRows.length > 0 ? balanceRows[0].balance_amount : 0;
+    let newBalance = currentBalance + added_balance;
 
     if (balanceRows.length === 0) {
-      // Step 2: No record exists, create a new balance entry
-      currentBalance = 0; // Initial balance if none exists
-      newBalance = added_balance;
-
       await connection.execute(
         "INSERT INTO tbl_balance (user_id, balance_amount) VALUES (?, ?)",
         [id, newBalance]
       );
     } else {
-      // Record exists, update the existing balance
-      currentBalance = balanceRows[0].balance_amount;
-      newBalance = currentBalance + added_balance;
-
       await connection.execute(
         "UPDATE tbl_balance SET balance_amount = ? WHERE user_id = ?",
         [newBalance, id]
       );
     }
 
-    // Step 3: Log the transaction
     await connection.execute(
       "INSERT INTO tbl_history (user_id, remaining_balance, added_balance, new_balance) VALUES (?, ?, ?, ?)",
       [id, currentBalance, added_balance, newBalance]
@@ -92,19 +85,22 @@ const addBalance = asyncHandler(async (req, res) => {
       new_balance: newBalance,
     });
   } catch (error) {
-    await connection.rollback();
+    if (connection) {
+      await connection.rollback();
+    }
     console.error("Error updating balance and recording history: ", error);
     return res.status(500).json({
       error:
         "An error occurred while updating the balance and recording the history",
     });
   } finally {
-    connection.release(); // Release the connection back to the pool
+    if (connection) {
+      connection.release();
+    }
   }
 });
 
-module.exports = addBalance;
-
+// Function to edit balance for a user
 const editBalance = asyncHandler(async (req, res) => {
   const { new_balance } = req.body;
   const { id } = req.params;
@@ -119,11 +115,11 @@ const editBalance = asyncHandler(async (req, res) => {
       .json({ error: "Valid new balance amount is required" });
   }
 
-  const connection = await db.promise().getConnection();
+  let connection;
   try {
+    connection = await db.getConnection();
     await connection.beginTransaction();
 
-    // Step 1: Get the current balance
     const [balanceRows] = await connection.execute(
       "SELECT balance_amount FROM tbl_balance WHERE user_id = ?",
       [id]
@@ -137,13 +133,11 @@ const editBalance = asyncHandler(async (req, res) => {
 
     const currentBalance = balanceRows[0].balance_amount;
 
-    // Step 2: Update the balance
     await connection.execute(
       "UPDATE tbl_balance SET balance_amount = ? WHERE user_id = ?",
       [new_balance, id]
     );
 
-    // Step 3: Log the change in history
     await connection.execute(
       "INSERT INTO tbl_history (user_id, remaining_balance, added_balance, new_balance) VALUES (?, ?, ?, ?)",
       [id, currentBalance, new_balance - currentBalance, new_balance]
@@ -156,26 +150,32 @@ const editBalance = asyncHandler(async (req, res) => {
       new_balance,
     });
   } catch (error) {
-    await connection.rollback();
+    if (connection) {
+      await connection.rollback();
+    }
     console.error("Error updating balance and recording history: ", error);
     return res.status(500).json({
       error:
         "An error occurred while updating the balance and recording the history",
     });
   } finally {
-    connection.release();
+    if (connection) {
+      connection.release();
+    }
   }
 });
 
+// Function to get transaction history for a user
 const getHistory = asyncHandler(async (req, res) => {
-  const { id } = req.params; // Extract user_id from route parameters
+  const { id } = req.params;
 
   if (!id) {
     return res.status(400).json({ error: "User ID is required" });
   }
 
+  let connection;
   try {
-    const connection = await db.getConnection();
+    connection = await db.getConnection();
     const query = `
       SELECT id, user_id, remaining_balance, added_balance, new_balance, history_date
       FROM tbl_history
@@ -197,13 +197,10 @@ const getHistory = asyncHandler(async (req, res) => {
       .status(500)
       .json({ error: "An error occurred while retrieving the history" });
   } finally {
-    // Ensure the connection is released back to the pool
     if (connection) {
       connection.release();
     }
   }
 });
-
-module.exports = getHistory;
 
 module.exports = { getBalance, addBalance, editBalance, getHistory };
