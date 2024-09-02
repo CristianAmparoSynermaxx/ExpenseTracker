@@ -15,11 +15,12 @@ const getExpenses = asyncHandler(async (req, res) => {
   const queryParams = [id];
 
   if (filterBy) {
-    query += " WHERE expense_title LIKE ?";
+    query += " AND expense_title LIKE ?";
     queryParams.push(`%${filterBy}%`);
   }
 
-  query += " LIMIT ? OFFSET ?";
+  // Add ORDER BY clause to sort by expense_date
+  query += " ORDER BY expense_date DESC LIMIT ? OFFSET ?";
   queryParams.push(parseInt(limit, 10), offset);
 
   try {
@@ -62,14 +63,17 @@ const getExpense = asyncHandler(async (req, res) => {
 const addExpense = asyncHandler(async (req, res) => {
   const { userId, title, category, amount } = req.body;
 
-  if (
-    !userId ||
-    !title ||
-    category === "Select Category" ||
-    !amount ||
-    amount <= 0
-  ) {
-    return res.status(400).json({ error: "Invalid input data" });
+  if (!userId) {
+    return res.status(400).json({ error: "Not Authorize" });
+  }
+  if (!title) {
+    return res.status(400).json({ error: "Please fill out the title field" });
+  }
+  if (!amount) {
+    return res.status(400).json({ error: "Please fill out the amount field" });
+  }
+  if (category === "") {
+    return res.status(400).json({ error: "Please select category" });
   }
 
   const connection = await db.getConnection();
@@ -130,15 +134,17 @@ const updateExpense = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { userId, title, category, amount } = req.body;
 
-  if (
-    !id ||
-    !userId ||
-    !title ||
-    !category ||
-    category === "Select Category" ||
-    !amount
-  ) {
-    return res.status(400).json({ error: "Invalid input data" });
+  if (!userId) {
+    return res.status(400).json({ error: "Not Authorize" });
+  }
+  if (!title) {
+    return res.status(400).json({ error: "Please fill out the title field" });
+  }
+  if (!amount) {
+    return res.status(400).json({ error: "Please fill out the amount field" });
+  }
+  if (category === "") {
+    return res.status(400).json({ error: "Please select category" });
   }
 
   try {

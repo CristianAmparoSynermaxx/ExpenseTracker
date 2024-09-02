@@ -10,7 +10,7 @@ const logout = () => {
 
 <template>
   <header
-    class="fixed top-0 z-10 left-0 right-0 flex items-center justify-between h-20 w-full px-12 shadow-md"
+    class="fixed top-0 z-50 left-0 right-0 flex items-center justify-between h-20 w-full px-12 shadow-md bg-white"
   >
     <div class="font-semibold text-2xl">Expense Tracker</div>
     <nav class="flex items-center">
@@ -59,10 +59,12 @@ const logout = () => {
               <img src="/User.png" alt="" />
               <h3>Account</h3>
             </ul>
-            <ul @click="logout">
-              <img src="/Exit.png" alt="" />
-              <h3>Logout</h3>
-            </ul>
+            <RouterLink to="/login">
+              <ul @click="logout">
+                <img src="/Exit.png" alt="" />
+                <h3>Logout</h3>
+              </ul>
+            </RouterLink>
           </div>
         </nav>
       </aside>

@@ -9,7 +9,7 @@ const {
 const router = express.Router();
 
 router.get("/:id", getExpenses);
-router.get("/:id", getExpense);
+router.get("/expense/:id", getExpense);
 router.post("/", addExpense);
 router.put("/:id", updateExpense);
 router.delete("/:id", deleteExpense);
