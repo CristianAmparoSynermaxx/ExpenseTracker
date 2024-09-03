@@ -9,7 +9,7 @@ const headers = GetHeaders();
 const userID = JSON.parse(localStorage.getItem("userData")).id;
 
 const props = defineProps({
-  handleToggleAccount: {
+  toggleAccountModal: {
     type: Function,
   },
 });
@@ -62,7 +62,7 @@ const handleSubmit = async () => {
       showConfirmButton: false,
       timer: 1300,
     }).then(() => {
-      props.handleToggleAccount();
+      props.toggleAccountModal();
     });
   } catch (error) {
     Swal.fire({
@@ -71,10 +71,6 @@ const handleSubmit = async () => {
       text: error.response.data.error,
     });
   }
-};
-
-const cancel = () => {
-  // Handle cancel action (e.g., close the modal)
 };
 
 onMounted(async () => {
@@ -110,9 +106,9 @@ onMounted(async () => {
       >
         <div class="p-6 xl:space-y-4 sm:p-8">
           <h1
-            class="text-2xl font-bold leading-tight tracking-tight text-gray-900 text-center"
+            class="text-2xl font-bold leading-tight tracking-tight text-gray-700 text-center"
           >
-            Account <span class="text-primary">Settings</span>
+            Account <span class="text-black">Settings</span>
           </h1>
 
           <form
@@ -121,10 +117,10 @@ onMounted(async () => {
             @submit.prevent="handleSubmit"
           >
             <div
-              class="relative mx-auto bg-primary w-[137px] h-[137px] flex items-center rounded-full"
+              class="relative mx-auto bg-black w-[137px] h-[137px] flex items-center rounded-full"
             >
               <div
-                class="w-32 h-32 bg-orange-100 rounded-full overflow-hidden border-4 border-white flex justify-center items-center mx-auto"
+                class="w-32 h-32 bg-gray-100 rounded-full overflow-hidden border-4 border-white flex justify-center items-center mx-auto"
               >
                 <img
                   :src="
@@ -167,7 +163,7 @@ onMounted(async () => {
                   name="fname"
                   v-model="formData.fname"
                   placeholder="Enter first name"
-                  class="textInput sm:text-sm focus:ring-primary-hover focus:border-primary-hover"
+                  class="textInput sm:text-sm focus:ring-black-hover focus:border-black-hover"
                 />
               </div>
               <div>
@@ -178,7 +174,7 @@ onMounted(async () => {
                   name="lname"
                   v-model="formData.lname"
                   placeholder="Enter last name"
-                  class="textInput sm:text-sm focus:ring-primary-hover focus:border-primary-hover"
+                  class="textInput sm:text-sm focus:ring-black-hover focus:border-black-hover"
                 />
               </div>
             </div>
@@ -190,7 +186,7 @@ onMounted(async () => {
                 name="username"
                 v-model="formData.username"
                 placeholder="Enter new username"
-                class="textInput sm:text-sm focus:ring-primary-hover focus:border-primary-hover"
+                class="textInput sm:text-sm focus:ring-black-hover focus:border-black-hover"
               />
             </div>
             <div>
@@ -201,7 +197,7 @@ onMounted(async () => {
                 name="password"
                 v-model="formData.password"
                 placeholder="Enter new password"
-                class="textInput sm:text-sm focus:ring-primary-hover focus:border-primary-hover"
+                class="textInput sm:text-sm focus:ring-black-hover focus:border-black-hover"
               />
             </div>
             <div>
@@ -212,19 +208,19 @@ onMounted(async () => {
                 name="password2"
                 v-model="formData.password2"
                 placeholder="Repeat password"
-                class="textInput sm:text-sm focus:ring-primary-hover focus:border-primary-hover"
+                class="textInput sm:text-sm focus:ring-black-hover focus:border-black-hover"
               />
             </div>
             <button
               type="submit"
-              class="w-full text-white bg-primary hover:bg-primary-hover font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+              class="w-full text-white bg-black hover:bg-gray-800 hover:scale-105 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
             >
               Update Account
             </button>
             <button
               type="button"
-              class="w-full text-primary-hover border-2 border-primary hover:border-primary-hover font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-              @click="handleToggleAccount"
+              class="w-full text-black-hover border-2 border-black hover:border-gray-700 hover:text-gray-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center hover:scale-105"
+              @click="toggleAccountModal"
             >
               Cancel
             </button>

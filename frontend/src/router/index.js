@@ -10,9 +10,15 @@ const router = createRouter({
       meta: { requiresAuth: true, showNavbar: true },
     },
     {
-      path: "/expense",
-      name: "expense",
+      path: "/expenses",
+      name: "expenses",
       component: () => import("../views/ExpensesView.vue"),
+      meta: { requiresAuth: true, showNavbar: true },
+    },
+    {
+      path: "/history",
+      name: "history",
+      component: () => import("../views/BalanceHistoryView.vue"),
       meta: { requiresAuth: true, showNavbar: true },
     },
 

@@ -1,8 +1,6 @@
 <script setup>
 import AddExpenseModal from "@/components/AddExpenseModal.vue";
 import ExpenseCard from "@/components/ExpenseCard.vue";
-import { formatDate } from "@/utils/DateFormat";
-import { TruncatedString } from "@/utils/TruncateString";
 import { ref, onMounted, watch } from "vue";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -15,7 +13,8 @@ const apiHost = import.meta.env.VITE_host;
 const userId = JSON.parse(localStorage.getItem("userData")).id;
 const route = useRoute();
 
-const balance = ref("");
+const balance = ref(0);
+const totalExpense = ref(0);
 const expenses = ref([]);
 const formatter = new Intl.NumberFormat("en-US");
 const isAddExpenseModalOpen = ref(false);
@@ -24,48 +23,35 @@ const isAddBalanceModalOpen = ref(false);
 const isEditBalanceModalOpen = ref(false);
 const editExpenseId = ref("");
 
-const toggleAddExpenseModal = async () => {
-  isAddExpenseModalOpen.value = !isAddExpenseModalOpen.value;
-
-  if (!isAddExpenseModalOpen.value) {
-    // Fetch data when the modal is opened
-    await fetchExpenses();
+const toggleModal = async (modalRef, fetchFunction) => {
+  modalRef.value = !modalRef.value;
+  if (!modalRef.value && typeof fetchFunction === "function") {
+    await fetchFunction();
   }
+  fetchBalance();
 };
 
-const toggleAddBalanceModal = async () => {
-  isAddBalanceModalOpen.value = !isAddBalanceModalOpen.value;
-
-  if (!isAddBalanceModalOpen.value) {
-    // Fetch data when the modal is opened
-    await fetchBalance();
-  }
-};
-
-const toggleEditBalanceModal = async () => {
-  isEditBalanceModalOpen.value = !isEditBalanceModalOpen.value;
-
-  if (!isEditBalanceModalOpen.value) {
-    // Fetch data when the modal is opened
-    await fetchBalance();
-  }
-};
-
-const toggleEditExpenseModal = async (id) => {
-  isEditExpenseModalOpen.value = !isEditExpenseModalOpen.value;
+const toggleAddExpenseModal = () =>
+  toggleModal(isAddExpenseModalOpen, fetchExpenses);
+const toggleAddBalanceModal = () =>
+  toggleModal(isAddBalanceModalOpen, fetchBalance);
+const toggleEditBalanceModal = () =>
+  toggleModal(isEditBalanceModalOpen, fetchBalance);
+const toggleEditExpenseModal = (id) => {
   editExpenseId.value = id;
+  toggleModal(isEditExpenseModalOpen, fetchExpenses); // Pass fetchExpenses if needed
 };
 
-// Function to fetch expenses data from the server
 const fetchExpenses = async () => {
   try {
     const response = await axios.get(
       `${apiHost}api/expenses/${userId}?limit=10`
     );
-    expenses.value = response.data;
+    expenses.value = response.data.data;
+    totalExpense.value = response.data.totalAmount;
   } catch (error) {
     Swal.fire("Error", "Failed to fetch expense data", "error");
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -74,13 +60,11 @@ const fetchBalance = async () => {
     const response = await axios.get(`${apiHost}api/balance/${userId}`);
     balance.value = response.data.balance;
   } catch (error) {
-    Swal.fire("Error", "Failed to fetch balance data", "error");
-    console.log(error);
+    console.error(error);
   }
 };
 
 onMounted(() => {
-  // Fetch data initially
   fetchExpenses();
   fetchBalance();
 });
@@ -95,7 +79,7 @@ watch(
 </script>
 
 <template>
-  <main class="flex justify-center w-full p-5 z-0 h-full overflow-auto">
+  <main class="flex justify-center w-full p-5 pb-20 z-0 h-full overflow-auto">
     <div class="max-w-[786px] h-full w-full">
       <div
         class="bg-black z-0 rounded-2xl relative lg:h-[144px] h-28 w-full text-white flex flex-col items-center justify-center"
@@ -134,39 +118,50 @@ watch(
         class="w-full md:px-12 px-2 h-full max-h-[70%] flex flex-col gap-2 pb-5 overflow-auto border-b-2"
       >
         <ExpenseCard
+          v-if="expenses.length > 0"
           v-for="item in expenses"
           @click="toggleEditExpenseModal(item.id)"
           class="bg-white"
           :key="item.id"
-          :title="TruncatedString(item.expense_title)"
+          :title="item.expense_title"
           :category="item.expense_category"
           :amount="item.expense_amount"
-          :date="formatDate(item.expense_date)"
+          :date="item.expense_date"
         />
+        <h1
+          v-else
+          class="textblack w-full flex items-start justify-center h-full"
+        >
+          There is no record to display
+        </h1>
       </div>
-      <h3
-        class="font-bold md:text-lg py-2 text-sm pl-4 w-full text-end lg:px-24 md:px-20 px-12 hover:underline cursor-pointer"
-      >
-        See More
-      </h3>
+      <div class="w-full flex items-center justify-between lg:px-12 px-4">
+        <h3
+          class="font-bold md:text-lg py-2 text-sm hover:underline cursor-pointer"
+        >
+          Expense Amount: ₱{{ formatter.format(totalExpense) }}.00
+        </h3>
+        <h3
+          class="font-bold md:text-lg py-2 text-sm hover:underline cursor-pointer"
+        >
+          See More
+        </h3>
+      </div>
     </div>
 
     <AddExpenseModal
       v-if="isAddExpenseModalOpen"
       :toggleAddExpenseModal="toggleAddExpenseModal"
     />
-
     <EditExpenseModal
       v-if="isEditExpenseModalOpen"
       :toggleEditExpenseModal="toggleEditExpenseModal"
       :editExpenseId="editExpenseId"
     />
-
     <AddBalanceModal
       v-if="isAddBalanceModalOpen"
       :toggleAddBalanceModal="toggleAddBalanceModal"
     />
-
     <EditBalanceModal
       v-if="isEditBalanceModalOpen"
       :toggleEditBalanceModal="toggleEditBalanceModal"

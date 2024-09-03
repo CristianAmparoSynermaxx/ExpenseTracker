@@ -67,7 +67,7 @@ const handleSubmit = async () => {
 <template>
   <section class="bg-gray-100">
     <div
-      class="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen lg:py-0"
+      class="flex flex-col items-center -mt-40 justify-center px-6 mx-auto h-screen lg:py-0"
     >
       <div
         class="w-full bg-white rounded-lg shadow-xl md:mt-0 sm:max-w-md xl:p-0"

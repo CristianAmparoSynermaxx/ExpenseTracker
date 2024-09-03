@@ -168,9 +168,22 @@ const editBalance = asyncHandler(async (req, res) => {
 // Function to get transaction history for a user
 const getHistory = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  const { page = 1, limit = 10 } = req.query;
 
   if (!id) {
     return res.status(400).json({ error: "User ID is required" });
+  }
+
+  // Validate page and limit
+  const pageNumber = parseInt(page, 10);
+  const pageSize = parseInt(limit, 10);
+
+  if (isNaN(pageNumber) || pageNumber <= 0) {
+    return res.status(400).json({ error: "Invalid page number" });
+  }
+
+  if (isNaN(pageSize) || pageSize <= 0) {
+    return res.status(400).json({ error: "Invalid limit" });
   }
 
   let connection;
@@ -181,8 +194,21 @@ const getHistory = asyncHandler(async (req, res) => {
       FROM tbl_history
       WHERE user_id = ?
       ORDER BY history_date DESC
+      LIMIT ? OFFSET ?
     `;
-    const [rows] = await connection.execute(query, [id]);
+
+    // Calculate offset based on page number and page size
+    const offset = (pageNumber - 1) * pageSize;
+    const [rows] = await connection.execute(query, [id, pageSize, offset]);
+
+    // Get total count of records for pagination
+    const countQuery = `
+      SELECT COUNT(*) AS total
+      FROM tbl_history
+      WHERE user_id = ?
+    `;
+    const [countRows] = await connection.execute(countQuery, [id]);
+    const totalRecords = countRows[0].total;
 
     if (rows.length === 0) {
       return res
@@ -190,7 +216,15 @@ const getHistory = asyncHandler(async (req, res) => {
         .json({ message: "No history found for the given user ID" });
     }
 
-    return res.json({ history: rows });
+    return res.json({
+      history: rows,
+      pagination: {
+        total: totalRecords,
+        page: pageNumber,
+        limit: pageSize,
+        totalPages: Math.ceil(totalRecords / pageSize),
+      },
+    });
   } catch (error) {
     console.error("Error retrieving history: ", error.message, error.stack);
     return res

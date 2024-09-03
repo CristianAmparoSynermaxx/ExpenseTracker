@@ -63,7 +63,7 @@ const handleEdit = async (event) => {
 <template>
   <section>
     <div
-      class="absolute inset-0 flex justify-center backdrop-blur-sm items-center z-20"
+      class="absolute inset-0 flex justify-center -mt-40 backdrop-blur-sm items-center z-20"
     >
       <div class="px-4 py-10 bg-white h-max shadow-2xl rounded-3xl w-96">
         <div class="max-w-md mx-auto text-black px-2 space-y-5">

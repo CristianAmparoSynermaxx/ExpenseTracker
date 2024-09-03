@@ -4,7 +4,7 @@ import Navbar from "./components/Navbar.vue";
 </script>
 
 <template>
-  <Navbar v-if="$route.meta.showNavbar" class="z-50" />
+  <Navbar v-if="$route.meta.showNavbar" />
   <section
     :class="
       ($route.meta.showNavbar ? 'py-20' : '',

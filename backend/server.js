@@ -15,6 +15,4 @@ app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/expenses", require("./routes/expenseRoutes"));
 app.use("/api/balance", require("./routes/balanceRoutes"));
 
-app.use(errorHandler);
-
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
