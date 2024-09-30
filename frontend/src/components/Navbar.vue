@@ -85,7 +85,9 @@ const isActive = (path) => route.path === path;
         </RouterLink>
       </nav>
       <label id="overlay" htmlFor="sidebar-active"></label>
-      <aside class="sidebar-container w-96 bg-white fixed top-0 bottom-0 p-5">
+      <aside
+        class="sidebar-container max-w-96 w-full bg-white fixed top-0 bottom-0 p-5"
+      >
         <label htmlFor="sidebar-active" class="cursor-pointer bg-white">
           <img class="w-10" src="/close.svg" alt="" />
         </label>

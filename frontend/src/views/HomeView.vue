@@ -141,11 +141,13 @@ watch(
         >
           Expense Amount: ₱{{ formatter.format(totalExpense) }}.00
         </h3>
-        <h3
-          class="font-bold md:text-lg py-2 text-sm hover:underline cursor-pointer"
-        >
-          See More
-        </h3>
+        <RouterLink to="/expenses">
+          <h3
+            class="font-bold md:text-lg py-2 text-sm hover:underline cursor-pointer"
+          >
+            See More
+          </h3>
+        </RouterLink>
       </div>
     </div>
 
