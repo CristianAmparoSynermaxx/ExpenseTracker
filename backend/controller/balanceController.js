@@ -59,7 +59,7 @@ const addBalance = asyncHandler(async (req, res) => {
 
     let currentBalance =
       balanceRows.length > 0 ? balanceRows[0].balance_amount : 0;
-    let newBalance = currentBalance + added_balance;
+    let newBalance = currentBalance + parseInt(added_balance, 10);
 
     if (balanceRows.length === 0) {
       await connection.execute(

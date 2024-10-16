@@ -10,6 +10,12 @@ const router = createRouter({
       meta: { requiresAuth: true, showNavbar: true },
     },
     {
+      path: "/sample",
+      name: "sample",
+      component: () => import("../views/Sample.vue"),
+      meta: { requiresAuth: false, showNavbar: false },
+    },
+    {
       path: "/expenses",
       name: "expenses",
       component: () => import("../views/ExpensesView.vue"),

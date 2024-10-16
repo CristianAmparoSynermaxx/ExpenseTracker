@@ -50,11 +50,9 @@ const handleSubmit = async () => {
   formDataToSend.append("password2", formData.value.password2);
 
   try {
-    const response = await axios.put(
-      `${apiHost}api/users/${userID}`,
-      formDataToSend,
-      { headers }
-    );
+    const response = await axios.put(`${apiHost}api/users/${userID}`, formDataToSend, {
+      headers,
+    });
     Swal.fire({
       icon: "success",
       title: "Success!",
@@ -95,15 +93,9 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <section
-    class="fixed top-0 bottom-0 left-0 right-0 backdrop-blur-sm bg-backdrop z-50"
-  >
-    <div
-      class="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen"
-    >
-      <div
-        class="w-full bg-white rounded-lg shadow-xl md:mt-0 sm:max-w-md xl:p-0"
-      >
+  <section class="fixed top-0 bottom-0 left-0 right-0 backdrop-blur-sm bg-backdrop z-50">
+    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen">
+      <div class="w-full bg-white rounded-lg shadow-xl md:mt-0 sm:max-w-md xl:p-0">
         <div class="p-6 xl:space-y-4 sm:p-8">
           <h1
             class="text-2xl font-bold leading-tight tracking-tight text-gray-700 text-center"
@@ -111,11 +103,7 @@ onMounted(async () => {
             Account <span class="text-black">Settings</span>
           </h1>
 
-          <form
-            class="space-y-2 bg-white"
-            name="form"
-            @submit.prevent="handleSubmit"
-          >
+          <form class="space-y-2 bg-white" name="form" @submit.prevent="handleSubmit">
             <div
               class="relative mx-auto bg-black w-[137px] h-[137px] flex items-center rounded-full"
             >
@@ -137,11 +125,7 @@ onMounted(async () => {
                   htmlFor="imageInput"
                   class="absolute bottom-1 right-0 rounded-full w-10 h-10 bg-slate-600 hover:bg-slate-700 p-2 text-white cursor-pointer flex justify-center items-center"
                 >
-                  <img
-                    class="w-5 h-5 object-center"
-                    src="/editProfile.png"
-                    alt=""
-                  />
+                  <img class="w-5 h-5 object-center" src="/editProfile.png" alt="" />
                   <span class="sr-only">Choose an image to upload</span>
                 </label>
                 <input

@@ -124,7 +124,7 @@ const changePage = (action) => {
             <tr v-for="item in sortedData" :key="item.id">
               <td>{{ formatDate(item.history_date) }}</td>
               <td>₱{{ formatter.format(item.remaining_balance) }}.00</td>
-              <td>₱{{ formatter.format(item.added_balance) }}.00</td>
+              <td :class="item.added_balance < 0 ? 'text-red-700' : 'text-green-600'">₱{{ formatter.format(item.added_balance) }}.00</td>
               <td>₱{{ formatter.format(item.new_balance) }}.00</td>
             </tr>
           </tbody>
